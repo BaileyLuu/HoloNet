@@ -1,0 +1,26 @@
+form{
+  text-align: center;
+}
+label{
+  text-align: left;
+}
+input[type=text] {
+       
+}
+input[type=submit]{
+        padding: 5px 15px;
+        background: #ffff;
+        border: 2px solid #99e0b2;
+        cursor: pointer;
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+}
+
+input[type=submit]:hover {
+        padding: 5px 15px;
+        background: #99e0b2;
+        border: 0 none;
+        cursor: pointer;
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+      }
