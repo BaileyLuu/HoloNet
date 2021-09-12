@@ -6,48 +6,127 @@
 	<meta name="viewport" content="width=device-width">
 	<title>HoloNet</title>
 	<link href="style.css" rel="stylesheet" type="text/css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-   crossorigin=""/>
-   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-   crossorigin=""></script>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+	 crossorigin="" />
+	<link rel="stylesheet" href="material-icon/css/material-design-iconic-font.min.css">
+
+
+
+	<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+	 crossorigin="">
+
+	</script>
+
 </head>
 <style>
+	#mapid {
+		height: 350px;
+		width: 600px;
+		margin-left: 800px;
 
-  #mapid { height: 250px; }
+	}
 </style>
+
 <body>
-  <nav>
-    <div style="text-align:center">
-    <a href="/"><img src="./HoloNet.png" alt="logo" style="width:200px;height:200px;"></a>
+
+	<nav>
+		<div style="text-align:left">
+			<a href="/"><img src="./HoloNet.png" alt="logo" style="width:200px;height:200px;"></a>
     </div>
   </nav>
-	<form>
-    <div>
-		<label for="fname">Name:</label>
-    <input type="text" id="fname" name="fname"><br><br>
+
+
+  <section class="subscribe">
+	<form name="myForm" onsubmit="onSubmit()">
+    <div class="form-group">
+		<label for="name"><i class="zmdi zmdi-account material-icons-name"></i></label>
+    <input type="text" id="name" name="name"placeholder="Enter your name" onfocus="placeholder=''" onblur="placeholder='Enter your name'" required><br>
     </div>
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email"><br><br>
-    <label for="phone">Phone:</label>
+    <div class="form-group">
+    <label for="email"><i class="zmdi zmdi-email"></i></label>
+    <input type="email" id="email" name="email" placeholder="Enter your email" onfocus="placeholder=''" onblur="placeholder='Enter your email'" required><br>
+    </div>
+    <div class="form-group">
+    <label for="phone"><i class="zmdi zmdi-phone"></i></label>
     <!-- <input type="tel" id="phone" name="phone" placeholder="123-45-678" pattern="^\\+(?:[0-9]?){6,14}[0-9]$" required><br><br> -->
-    <input type="tel" id="phone" name="phone" placeholder="123-45-678" pattern="\+[0-9]{3}[0-9]{3}[0-9]{3}[0-9]{4}" required><br><br>
+    <input type="tel" id="phone" name="phone" placeholder="Enter phone with country code" onfocus="placeholder=''" onblur="placeholder='Enter phone with country code'" required>
     <!-- [0-9]{3}-[0-9]{2}-[0-9]{3}-->
-    <label for="location">Location:</label>
-    <input type="text" id="location" name="location"><br><br>
+    </div>
+    <div class="form-group">
+   <label for="place"><i class="zmdi zmdi-map"></i>:</label>
+    <input type="text" id="place" onchange="getData()"name="place" placeholder="Enter your location" onfocus="placeholder=''" onblur="placeholder='Enter your location'" ><br><br>
     <input type="submit" value="Subscribe">
+    <!-- onClick="document.location.href='index.html'" -->
+    </div>
     </form>
-    <br>
+    <br><br>
 <div id="mapid"></div>  
-    <script src="script.js"></script>
-    <script>
-      const mymap = L.map('mapid').setView([51.505, -0.09], 13);
+</section>
+    <script> 
+       function onSubmit(e){
+        e.preventDefault()
+       alert("here")
+        var name=document.forms['myForm']['name'].value;
+         var phone=document.forms['myForm']['phone'].value;
+          var place=document.forms['myForm']['place'].value;
+           var email=document.forms['myForm']['email'].value;
+          fetch(
+          "https://disaterapi.herokuapp.com/user/save",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name,
+              phone:phone,
+              email:email,
+              place:place
+            }).then(response => response.json())
+  .then(data => alert(data));,
+          }
+        );
+        
+     
+      }
+      function getData(){
+        var address = document.getElementById('place').value;
+        var url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + address + "&key=AIzaSyAL8C_m3qpqSfwlCR3oKKCWGNueSGWVlKA"
+       var xmlHttp = new XMLHttpRequest()
+        xmlHttp.open("GET", url, false);
+        xmlHttp.send(null);
+        var json = JSON.parse(xmlHttp.responseText);
+        console.log(json)
+        var latitude = json.results[0].geometry.location.lat;
+        var longtitude = json.results[0].geometry.location.lng;
+
+        const mymap = L.map('mapid').setView([latitude, longtitude], 20);
+
+        
+      // mymap.locate({setView: true, maxZoom: 20, }).on('locationfound', function(e){
+      //   var marker = L.marker([e.latitude, e.longitude]).bindPopup('Your are here :)');
+      // });
+      // map.addLayer(marker);
+
+      // mymap.locate({setView: true, watch: true,enableHighAccuracy: true}) /* This will return map so you can do chaining */
+      //   .on('locationfound', function(e){
+      //       var marker = L.marker([e.latitude, e.longitude]).bindPopup('Your are here :)');
+            
+      //       mymap.addLayer(marker);
+      //   })
+      //  .on('locationerror', function(e){
+      //       console.log(e);
+      //       alert("Location access denied.");
+      //   });
       const attribution =
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
       const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
           const tiles = L.tileLayer(tileUrl, { attribution });
           tiles.addTo(mymap);
+          // var marker = L.marker([latitude, longitude]).addTo(mymap);
+      }
+      
+      
     </script>
   </body>
 </html>
